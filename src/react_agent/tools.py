@@ -27,7 +27,6 @@ async def search(query: str) -> Optional[dict[str, Any]]:
     wrapped = TavilySearch(max_results=runtime.context.max_search_results)
     return cast(dict[str, Any], await wrapped.ainvoke({"query": query}))
 
-@tools ("MyWeatherTool")
 async def get_weather(city: str) -> Optional[dict[str, Any]]:
     geocode_url = "https://nominatim.openstreetmap.org/search"
     params = {
