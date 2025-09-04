@@ -28,6 +28,7 @@ async def search(query: str) -> Optional[dict[str, Any]]:
     return cast(dict[str, Any], await wrapped.ainvoke({"query": query}))
 
 async def get_weather(city: str) -> Optional[dict[str, Any]]:
+    """Get weather info for given city. """
     geocode_url = "https://nominatim.openstreetmap.org/search"
     params = {
         "q": city,
