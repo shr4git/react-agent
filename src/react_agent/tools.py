@@ -105,6 +105,6 @@ async def get_weather_str(city: str) -> str:
     return f"The current temperature in {city.title()} is {temp}°C with wind speed {windspeed} km/h (weather code: {weather_code})."
 
 
-TOOLS: List[Callable[..., Any]] = [search, get_weather]
-#TOOLS: List[Callable[..., Any]] = [search]
+#TOOLS: List[Callable[..., Any]] = [search, get_weather]
+TOOLS: List[Callable[..., Any]] = [search]
 
