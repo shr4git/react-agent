@@ -27,7 +27,32 @@ async def search(query: str) -> Optional[dict[str, Any]]:
     wrapped = TavilySearch(max_results=runtime.context.max_search_results)
     return cast(dict[str, Any], await wrapped.ainvoke({"query": query}))
 
-async def get_weather(city: str) -> Optional[dict[str, Any]]:
+async def get_weather(city: str) -> str:
+    """Returns current weather in the specified city via Open‑Meteo APIs."""
+    try:
+        # Geocode
+        geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1"
+        geo_resp = await asyncio.to_thread(requests.get, geo_url, timeout=10)
+        geo_resp.raise_for_status()
+        geo = geo_resp.json()
+        if "results" not in geo or not geo["results"]:
+            return f"Sorry, could not find location info for city '{city}'."
+
+        lat = geo["results"][0]["latitude"]
+        lon = geo["results"][0]["longitude"]
+
+        # Weather
+        wx_url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true"
+        wx_resp = await asyncio.to_thread(requests.get, wx_url, timeout=10)
+        wx_resp.raise_for_status()
+        wx = wx_resp.json()
+        t = wx["current_weather"]["temperature"]
+        w = wx["current_weather"]["windspeed"]
+        return f"Current weather in {city}: temperature {t}°C, windspeed {w} km/h."
+    except Exception as e:
+        return f"Error retrieving weather data: {e}"
+
+async def get_weather_1(city: str) -> Optional[dict[str, Any]]:
     """Get weather info for given city. """
     geocode_url = "https://nominatim.openstreetmap.org/search"
     params = {
@@ -105,6 +130,6 @@ async def get_weather_str(city: str) -> str:
     return f"The current temperature in {city.title()} is {temp}°C with wind speed {windspeed} km/h (weather code: {weather_code})."
 
 
-#TOOLS: List[Callable[..., Any]] = [search, get_weather]
-TOOLS: List[Callable[..., Any]] = [search]
+TOOLS: List[Callable[..., Any]] = [search, get_weather]
+#TOOLS: List[Callable[..., Any]] = [search]
 
